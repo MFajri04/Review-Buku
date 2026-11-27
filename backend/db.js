@@ -1,11 +1,17 @@
+const fs = require('fs');
 const mysql = require('mysql2/promise');
 require('dotenv').config();
 
-const pool=mysql.createPool({
+const defaultSocket = '/tmp/mysql.sock';
+const socketPath = process.env.DB_SOCKET || (fs.existsSync(defaultSocket) ? defaultSocket : undefined);
+
+const pool = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
-    password:process.env.DB_PASS,
+    password: process.env.DB_PASS,
     database: process.env.DB_NAME,
+    port: process.env.DB_PORT || 3306,
+    ...(socketPath ? { socketPath } : {}),
 });
 
-module.exports=pool;
+module.exports = pool;
